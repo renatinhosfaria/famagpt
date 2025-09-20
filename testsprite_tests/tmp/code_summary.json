@@ -1,0 +1,119 @@
+{
+  "project_name": "FamaGPT",
+  "description": "Multi-agent AI system for real estate agents specializing in Uberlândia/MG, featuring microservices architecture with LangGraph orchestration",
+  "tech_stack": {
+    "backend": {
+      "language": "Python",
+      "framework": "FastAPI",
+      "architecture": "Microservices",
+      "orchestration": "LangGraph",
+      "ai_frameworks": ["LangChain", "OpenAI", "Whisper"],
+      "databases": ["PostgreSQL", "Redis"],
+      "web_scraping": "Playwright",
+      "containerization": "Docker",
+      "messaging": "WhatsApp Evolution API"
+    },
+    "infrastructure": {
+      "reverse_proxy": "Docker Compose",
+      "caching": "Redis",
+      "monitoring": "LangSmith",
+      "testing": "pytest"
+    }
+  },
+  "services": [
+    {
+      "name": "orchestrator",
+      "port": 8000,
+      "description": "LangGraph-based workflow orchestration with LangSmith observability",
+      "dependencies": ["redis", "database"],
+      "main_features": ["workflow_management", "langgraph_integration", "agent_coordination"]
+    },
+    {
+      "name": "webhooks", 
+      "port": 8001,
+      "description": "WhatsApp integration via Evolution API",
+      "dependencies": ["redis", "database", "orchestrator"],
+      "main_features": ["whatsapp_integration", "webhook_handling", "message_processing"]
+    },
+    {
+      "name": "transcription",
+      "port": 8002,
+      "description": "Whisper-based audio-to-text conversion",
+      "dependencies": ["redis", "database"],
+      "main_features": ["audio_transcription", "whisper_integration", "file_processing"]
+    },
+    {
+      "name": "web_search",
+      "port": 8003,
+      "description": "Playwright-powered property search and scraping",
+      "dependencies": ["redis", "database"],
+      "main_features": ["web_scraping", "property_search", "playwright_automation"]
+    },
+    {
+      "name": "memory",
+      "port": 8004,
+      "description": "Hybrid short/long-term memory system",
+      "dependencies": ["redis", "database"],
+      "main_features": ["conversation_memory", "context_management", "memory_persistence"]
+    },
+    {
+      "name": "rag",
+      "port": 8005,
+      "description": "Retrieval-Augmented Generation pipeline",
+      "dependencies": ["redis", "database"],
+      "main_features": ["document_retrieval", "vector_embeddings", "knowledge_base"]
+    },
+    {
+      "name": "database",
+      "port": 8006,
+      "description": "PostgreSQL integration service",
+      "dependencies": ["redis"],
+      "main_features": ["database_management", "postgresql_integration", "data_persistence"]
+    },
+    {
+      "name": "specialist",
+      "port": 8007,
+      "description": "Real estate domain expert agent",
+      "dependencies": ["redis", "database", "memory", "rag", "web_search"],
+      "main_features": ["real_estate_expertise", "domain_knowledge", "agent_specialization"]
+    }
+  ],
+  "key_features": [
+    "Multi-agent AI system",
+    "WhatsApp integration",
+    "Voice transcription",
+    "Property search and scraping",
+    "Hybrid memory management",
+    "Document RAG system",
+    "Real estate specialization",
+    "Microservices architecture",
+    "LangGraph orchestration",
+    "Redis communication"
+  ],
+  "deployment": {
+    "method": "Docker Compose",
+    "network": "famagpt_network",
+    "volumes": ["redis_data", "transcription_temp", "playwright_browsers", "rag_documents"]
+  },
+  "environment_variables": [
+    "OPENAI_API_KEY",
+    "LANGCHAIN_API_KEY",
+    "EVOLUTION_API_KEY",
+    "DATABASE_URL",
+    "WEBHOOK_SECRET"
+  ],
+  "test_scope": "backend",
+  "main_endpoints": {
+    "health_checks": [
+      "http://localhost:8000/health",
+      "http://localhost:8001/health",
+      "http://localhost:8002/health",
+      "http://localhost:8003/health",
+      "http://localhost:8004/health",
+      "http://localhost:8005/health",
+      "http://localhost:8006/health",
+      "http://localhost:8007/health"
+    ],
+    "api_prefix": "/api/v1"
+  }
+}

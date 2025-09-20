@@ -1,0 +1,18 @@
+# Security: prevent committing secrets
+.env
+.env.*
+!.env.example
+
+# TestSprite MCP local env (já coberto pelas regras acima)
+# testsprite/.env
+
+# Common local artifacts (optional)
+*.log
+*.sqlite3
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+
+# BMAD (local only)
+.bmad-core/
+.bmad-*/

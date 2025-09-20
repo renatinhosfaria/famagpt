@@ -1,0 +1,17 @@
+{
+  "status": "commited",
+  "type": "backend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:8000",
+  "backendAuthType": "public",
+  "executionArgs": {
+    "projectName": "famagpt",
+    "projectPath": "/var/www/famagpt",
+    "testIds": [],
+    "additionalInstruction": "Validação final completa após implementação das 5 correções críticas: TC002 (webhooks whatsapp_integration), TC003 (transcription /api/v1/transcribe), TC006 (RAG results/documents), TC007 (database string status), TC008 (specialist dependencies). Executar todos os testes funcionais para verificar se o sistema agora atinge >90% de sucesso conforme previsto no plano de correção.",
+    "envs": {
+      "API_KEY": "sk-user-p9yWjgZbINVTud33mNUFMlnysa_-aM9qKMaew-UokN6xAgKchQSGZ83iMUstT1LXct1qgTWZ4mdIQWx_PM9cx43j-qJKQUX64MrQY7-r73qPcmvaeOu2woFBFf2Cbk-m7DA"
+    }
+  },
+  "proxy": "http://ec7ae113-8f57-4ae8-a25b-794d6fc6c3a3:GS6KQv3t2ZP5pT4XLbu9T8emfeBmN8Lt@tun.testsprite.com:8080"
+}

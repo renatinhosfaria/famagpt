@@ -1,0 +1,84 @@
+"""
+Orchestrator service configuration.
+"""
+import os
+from pydantic import Field
+from pydantic_settings import BaseSettings
+
+
+class DatabaseSettings(BaseSettings):
+    """Database configuration for shared clients."""
+    url: str = Field(..., env="DATABASE_URL")
+    host: str = Field("localhost", env="PGHOST")
+    port: int = Field(5432, env="PGPORT")
+    database: str = Field("famagpt", env="PGDATABASE")
+    username: str = Field("postgres", env="PGUSER")
+    password: str = Field("", env="PGPASSWORD")
+    
+    # Connection pool settings
+    pool_size: int = Field(10, env="DB_POOL_SIZE")
+    max_overflow: int = Field(20, env="DB_MAX_OVERFLOW")
+    pool_timeout: int = Field(30, env="DB_POOL_TIMEOUT")
+    
+    class Config:
+        env_file = ".env"
+
+
+class RedisSettings(BaseSettings):
+    """Redis configuration for shared clients."""
+    url: str = Field("redis://localhost:6379", env="REDIS_URL")
+    password: str = Field(None, env="REDIS_PASSWORD")
+    db: int = Field(0, env="REDIS_DB")
+    
+    # Connection settings
+    max_connections: int = Field(100, env="REDIS_MAX_CONNECTIONS")
+    retry_on_timeout: bool = Field(True, env="REDIS_RETRY_ON_TIMEOUT")
+    
+    class Config:
+        env_file = ".env"
+
+
+class OrchestratorSettings(BaseSettings):
+    """Simple orchestrator configuration."""
+    
+    # Service settings
+    service_name: str = Field("orchestrator", env="SERVICE_NAME")
+    port: int = Field(8000, env="PORT")
+    host: str = Field("0.0.0.0", env="HOST")
+    
+    # Database connection
+    database_url: str = Field(..., env="DATABASE_URL")
+    
+    # Redis connection
+    redis_url: str = Field("redis://redis:6379", env="REDIS_URL")
+    
+    # AI settings
+    openai_api_key: str = Field(..., env="OPENAI_API_KEY")
+    langchain_api_key: str = Field(None, env="LANGCHAIN_API_KEY")
+    langchain_tracing_v2: bool = Field(False, env="LANGCHAIN_TRACING_V2")
+    langchain_project: str = Field("famagpt-system", env="LANGCHAIN_PROJECT")
+    
+    # Environment settings
+    environment: str = Field("development", env="ENVIRONMENT")
+    log_level: str = Field("INFO", env="LOG_LEVEL")
+    debug: bool = Field(False, env="DEBUG")
+    
+    # Sub-configurations for shared clients (initialized separately to avoid conflicts)
+    @property
+    def database(self):
+        """Get database settings."""
+        return DatabaseSettings(url=self.database_url)
+    
+    @property  
+    def redis(self):
+        """Get redis settings."""
+        return RedisSettings()
+    
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
+        case_sensitive = False
+
+
+# Global settings instance
+settings = OrchestratorSettings()

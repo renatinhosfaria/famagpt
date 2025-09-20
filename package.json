@@ -1,0 +1,20 @@
+{
+  "name": "famagpt",
+  "version": "1.0.0",
+  "description": "Sistema avançado de inteligência artificial baseado em arquitetura de microserviços, utilizando LangGraph para orquestração de agentes especializados, seguindo os princípios da Clean Architecture.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install:bmad": "npx bmad-method install",
+    "bmad": "npx bmad-method",
+    "bmad:update": "npx bmad-method update",
+    "bmad:docs": "npx bmad-method docs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,42 @@
+[
+  {
+    "id": "TC001",
+    "title": "verify health endpoint of orchestrator service",
+    "description": "Test the /health endpoint of the orchestrator service to ensure it returns a successful status indicating the LangGraph workflow orchestration and agent coordination are operational."
+  },
+  {
+    "id": "TC002",
+    "title": "verify health endpoint of webhooks service",
+    "description": "Test the /health endpoint of the webhooks service to confirm WhatsApp integration and webhook message processing are functioning correctly."
+  },
+  {
+    "id": "TC003",
+    "title": "verify health endpoint of transcription service",
+    "description": "Test the /health endpoint of the transcription service to validate the Whisper-based audio transcription functionality and file processing are working as expected."
+  },
+  {
+    "id": "TC004",
+    "title": "verify health endpoint of web search service",
+    "description": "Test the /health endpoint of the web search service to ensure Playwright-powered property search and web scraping features are operational."
+  },
+  {
+    "id": "TC005",
+    "title": "verify health endpoint of memory service",
+    "description": "Test the /health endpoint of the memory service to confirm the hybrid short-term and long-term conversation memory management is functioning properly."
+  },
+  {
+    "id": "TC006",
+    "title": "verify health endpoint of rag service",
+    "description": "Test the /health endpoint of the rag service to validate the retrieval-augmented generation pipeline, document retrieval, and vector embedding functionalities."
+  },
+  {
+    "id": "TC007",
+    "title": "verify health endpoint of database service",
+    "description": "Test the /health endpoint of the database service to ensure PostgreSQL integration and data persistence are working correctly."
+  },
+  {
+    "id": "TC008",
+    "title": "verify health endpoint of specialist service",
+    "description": "Test the /health endpoint of the specialist service to confirm the real estate domain expert agent and its dependencies are operational."
+  }
+]

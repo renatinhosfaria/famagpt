@@ -1,0 +1,18 @@
+# Database specific
+alembic==1.13.1
+
+# FastAPI and web
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Shared dependencies (inline)
+pydantic==2.5.0
+pydantic-settings==2.1.0
+redis==5.0.1
+asyncpg==0.29.0
+httpx==0.25.2
+aiohttp==3.8.6
+
+# Development
+pytest==7.4.3
+pytest-asyncio==0.21.1

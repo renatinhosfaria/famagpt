@@ -1,0 +1,72 @@
+# Configuração do Prometheus para FamaGPT
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "alerts.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+scrape_configs:
+  # Serviços FamaGPT
+  - job_name: 'famagpt-orchestrator'
+    static_configs:
+      - targets: ['orchestrator:8000']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  - job_name: 'famagpt-webhooks'
+    static_configs:
+      - targets: ['webhooks:8001']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  - job_name: 'famagpt-transcription'
+    static_configs:
+      - targets: ['transcription:8002']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  - job_name: 'famagpt-web-search'
+    static_configs:
+      - targets: ['web_search:8003']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  - job_name: 'famagpt-memory'
+    static_configs:
+      - targets: ['memory:8004']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  - job_name: 'famagpt-rag'
+    static_configs:
+      - targets: ['rag:8005']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  - job_name: 'famagpt-database'
+    static_configs:
+      - targets: ['database:8006']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  - job_name: 'famagpt-specialist'
+    static_configs:
+      - targets: ['specialist:8007']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  # Redis e PostgreSQL (se configurados com exporters)
+  - job_name: 'redis-exporter'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+    
+  - job_name: 'postgres-exporter'
+    static_configs:
+      - targets: ['postgres-exporter:9187']

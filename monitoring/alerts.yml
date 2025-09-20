@@ -1,0 +1,89 @@
+# Alertas para FamaGPT
+groups:
+- name: famagpt_reliability
+  rules:
+  
+  # Circuit Breaker Alerts
+  - alert: CircuitBreakerOpen
+    expr: circuit_breaker_state == 1
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Circuit breaker aberto para {{ $labels.service }}:{{ $labels.function }}"
+      description: "Circuit breaker está aberto há mais de 5 minutos para {{ $labels.service }}:{{ $labels.function }}"
+
+  - alert: HighCircuitBreakerFailures
+    expr: rate(circuit_breaker_failures_total[5m]) > 0.1
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Alta taxa de falhas no circuit breaker"
+      description: "{{ $labels.service }}:{{ $labels.function }} está falhando em {{ $value }} requests/s"
+
+  # Message Processing Alerts
+  - alert: HighDuplicateMessageRate
+    expr: rate(duplicate_messages_total[5m]) > 0.1
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Alta taxa de mensagens duplicadas"
+      description: "Instância {{ $labels.instance_id }} está recebendo {{ $value }} mensagens duplicadas/s"
+
+  - alert: HighOutOfOrderMessages
+    expr: rate(out_of_order_messages_total[5m]) > 0.05
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Muitas mensagens fora de ordem"
+      description: "Instância {{ $labels.instance_id }} tem {{ $value }} mensagens fora de ordem/s"
+
+  - alert: SlowMessageProcessing
+    expr: histogram_quantile(0.95, rate(message_processing_duration_seconds_bucket[5m])) > 30
+    for: 3m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Processamento lento de mensagens"
+      description: "95% das mensagens {{ $labels.message_type }} levam mais de 30s para processar"
+
+  # Lock Alerts
+  - alert: HighLockFailures
+    expr: rate(conversation_lock_failures_total[5m]) > 0.05
+    for: 3m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Muitas falhas de lock de conversação"
+      description: "{{ $value }} falhas/s na aquisição de locks para {{ $labels.message_type }}"
+
+  - alert: SlowLockAcquisition
+    expr: histogram_quantile(0.95, rate(conversation_lock_duration_seconds_bucket[5m])) > 5
+    for: 3m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Aquisição lenta de locks"
+      description: "95% dos locks para {{ $labels.message_type }} levam mais de 5s"
+
+  # Service Health Alerts
+  - alert: ServiceDown
+    expr: up == 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Serviço {{ $labels.job }} está down"
+      description: "{{ $labels.job }} não está respondendo às métricas"
+
+  - alert: HighErrorRate
+    expr: rate(message_processing_total{status="error"}[5m]) > 0.1
+    for: 3m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Alta taxa de erros no processamento"
+      description: "{{ $value }} erros/s no processamento de {{ $labels.message_type }}"
