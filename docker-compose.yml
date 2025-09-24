@@ -39,6 +39,17 @@ services:
       - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
       - LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2}
       - LANGCHAIN_PROJECT=${LANGCHAIN_PROJECT}
+      # Rate Limiting & Cost Protection
+      - RATE_LIMIT_ENABLED=${RATE_LIMIT_ENABLED:-true}
+      - RATE_LIMIT_RPM=${RATE_LIMIT_RPM:-100}
+      - COST_LIMIT_BRL_DAY=${COST_LIMIT_BRL_DAY:-500.0}
+      - RATE_LIMIT_BURST=${RATE_LIMIT_BURST:-20}
+      # OpenTelemetry Observability
+      - OTEL_ENABLED=${OTEL_ENABLED:-true}
+      - OTEL_SERVICE_NAME=famagpt-orchestrator
+      - OTEL_SERVICE_VERSION=1.0.0
+      - OTEL_EXPORTER_OTLP_ENDPOINT=${OTEL_ENDPOINT:-http://localhost:4317}
+      - OTEL_TRACE_SAMPLE_RATE=${OTEL_SAMPLE_RATE:-0.1}
     depends_on:
       - redis
       - database

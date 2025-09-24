@@ -12,7 +12,11 @@
     "install:bmad": "npx bmad-method install",
     "bmad": "npx bmad-method",
     "bmad:update": "npx bmad-method update",
-    "bmad:docs": "npx bmad-method docs"
+    "bmad:docs": "echo 'Use *create-doc via BMad agents or check .bmad-core/user-guide.md'",
+    "bmad:refresh": "npx bmad-method install -f -i codex",
+    "bmad:list": "npx bmad-method list:expansions",
+    "bmad:validate": "npx bmad-method status",
+    "bmad:update-check": "npx bmad-method update-check"
   },
   "keywords": [],
   "author": "",

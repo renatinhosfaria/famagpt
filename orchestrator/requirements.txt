@@ -8,12 +8,29 @@ langsmith==0.1.113
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 
-# Shared dependencies (inline)
-pydantic==2.5.0
+# Shared dependencies (inline) - ALIGNED VERSION
+pydantic==2.5.3
 pydantic-settings==2.1.0
 redis==5.0.1
 asyncpg==0.29.0
 httpx==0.25.2
+
+# Rate Limiting & Cost Protection
+slowapi==0.1.9
+redis-rate-limiter==0.3.0
+
+# OpenTelemetry - Observability
+opentelemetry-api==1.21.0
+opentelemetry-sdk==1.21.0
+opentelemetry-instrumentation-fastapi==0.42b0
+opentelemetry-instrumentation-httpx==0.42b0
+opentelemetry-instrumentation-redis==0.42b0
+opentelemetry-exporter-otlp==1.21.0
+opentelemetry-semantic-conventions==0.42b0
+
+# Circuit Breakers & Resilience
+aiobreaker==1.4.0
+tenacity==8.2.3
 
 # Development
 pytest==7.4.3

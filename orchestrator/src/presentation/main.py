@@ -19,7 +19,11 @@ from ..infrastructure.langgraph_engine import LangGraphWorkflowEngine
 from ..infrastructure.repositories import InMemoryWorkflowRepository
 from ..infrastructure.agent_service import HTTPAgentService, LocalAgentService
 from ..infrastructure.memory_service import MemoryServiceClient
+from ..infrastructure.rate_limiter import RateLimiter, RateLimitConfig, RateLimitMiddleware
+from ..infrastructure.observability import initialize_observability, shutdown_observability, get_observability
+from ..infrastructure.circuit_breaker import get_circuit_breaker_manager
 from .routes import router
+from .monitoring_routes import router as monitoring_router
 from . import routes
 
 
@@ -53,6 +57,28 @@ async def lifespan(app: FastAPI):
         redis_client = RedisClient(settings.redis)
         await redis_client.connect()
         app_state["redis_client"] = redis_client
+
+        # Initialize Rate Limiter
+        rate_limit_config = RateLimitConfig(
+            enabled=os.environ.get("RATE_LIMIT_ENABLED", "true").lower() == "true",
+            requests_per_minute=int(os.environ.get("RATE_LIMIT_RPM", "100")),
+            cost_limit_per_day_brl=float(os.environ.get("COST_LIMIT_BRL_DAY", "500.0")),
+            burst_allowance=int(os.environ.get("RATE_LIMIT_BURST", "20"))
+        )
+        rate_limiter = RateLimiter(redis_client.client, rate_limit_config)
+        app_state["rate_limiter"] = rate_limiter
+
+        # Initialize OpenTelemetry Observability
+        observability_initialized = initialize_observability()
+        if observability_initialized:
+            logger.info("OpenTelemetry observability initialized")
+        else:
+            logger.warning("OpenTelemetry observability not initialized")
+
+        # Initialize Circuit Breaker Manager
+        circuit_breaker_manager = get_circuit_breaker_manager()
+        app_state["circuit_breaker_manager"] = circuit_breaker_manager
+        logger.info("Circuit breaker manager initialized")
         
         # Use in-memory repository since database service handles persistence
         workflow_repository = InMemoryWorkflowRepository()
@@ -92,8 +118,17 @@ async def lifespan(app: FastAPI):
         routes.get_workflow_status_use_case = get_workflow_status_use_case
         routes.agent_service = agent_service
         routes.memory_client = memory_client
-        
+
         logger.info("Orchestrator service started successfully")
+        logger.info("Rate limiting enabled",
+                   enabled=rate_limit_config.enabled,
+                   rpm=rate_limit_config.requests_per_minute,
+                   cost_limit_brl=rate_limit_config.cost_limit_per_day_brl)
+
+        logger.info("Infrastructure hardening complete",
+                   rate_limiting=rate_limit_config.enabled,
+                   observability=observability_initialized,
+                   circuit_breakers=True)
         
         yield
         
@@ -110,7 +145,10 @@ async def lifespan(app: FastAPI):
         
         if "database_client" in app_state:
             await app_state["database_client"].close()
-        
+
+        # Shutdown observability
+        shutdown_observability()
+
         logger.info("Orchestrator service stopped")
 
 
@@ -136,6 +174,10 @@ def create_app() -> FastAPI:
     )
     
     app.add_middleware(GZipMiddleware, minimum_size=1000)
+
+    # Add Rate Limiting Middleware
+    # Note: This will be initialized after app startup when rate_limiter is available
+    # We'll add it dynamically in the lifespan startup
     
     # Add root health endpoint BEFORE routes for priority
     @app.get("/health")
@@ -147,8 +189,41 @@ def create_app() -> FastAPI:
             "version": "1.0.0"
         }
     
+    # API v1 health endpoint (utiliza HealthChecker compartilhado)
+    @app.get("/api/v1/health")
+    async def health_check_api_v1():
+        """Health check detalhado para atender o HEALTHCHECK do Docker."""
+        try:
+            from shared.health.health_check import HealthChecker
+            settings = get_settings()
+            checker = HealthChecker("orchestrator")
+            deps = {
+                "redis_url": settings.redis.url,
+                "database_url": settings.service.database_url,
+            }
+            # OpenAI é opcional no orchestrator; incluir se configurado
+            if settings.ai.openai_api_key:
+                deps["openai_key"] = settings.ai.openai_api_key
+            result = await checker.run_all_checks(deps)
+            # Considerar unhealthy apenas se status geral for 'unhealthy'
+            from fastapi import Response
+            status = result.get("status", "healthy")
+            if status == "unhealthy":
+                return Response(content=__import__("json").dumps(result), media_type="application/json", status_code=503)
+            return result
+        except Exception as e:
+            # Em caso de falha inesperada, retornar unhealthy para sinalizar problema
+            from fastapi import Response
+            payload = {
+                "status": "unhealthy",
+                "service": "orchestrator",
+                "error": str(e)
+            }
+            return Response(content=__import__("json").dumps(payload), media_type="application/json", status_code=503)
+    
     # Add routes
     app.include_router(router, prefix="/api/v1")
+    app.include_router(monitoring_router, prefix="/api/v1")
     
     return app
 
